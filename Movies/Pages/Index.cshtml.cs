@@ -53,12 +53,38 @@ namespace Movies.Pages
         /// </summary>
         public void OnGet()
         {
-            MPAARatings = Request.Query["MPAARatings"];
-            Movies = MovieDatabase.Search(SearchTerms);
-            Movies = MovieDatabase.FilterByMPAARating(Movies, MPAARatings);
-            Movies = MovieDatabase.FilterByRottenTomatoes(Movies, TomMin, TomMax);
-            Movies = MovieDatabase.FilterByGenre(Movies, Genres);
-            Movies = MovieDatabase.FilterByIMDBRating(Movies, IMDBMin, IMDBMax);
+            //MPAARatings = Request.Query["MPAARatings"];
+            //SearchTerms = Request.Query["SearchTerms"];
+            //Genres = Request.Query["Genres"];
+            //Movies = MovieDatabase.Search(SearchTerms);
+            //Movies = MovieDatabase.FilterByMPAARating(Movies, MPAARatings);
+            //Movies = MovieDatabase.FilterByRottenTomatoes(Movies, TomMin, TomMax);
+            //Movies = MovieDatabase.FilterByGenre(Movies, Genres);
+            //Movies = MovieDatabase.FilterByIMDBRating(Movies, IMDBMin, IMDBMax);
+            Movies = MovieDatabase.All;
+    // Search movie titles for the SearchTerms
+            if (SearchTerms != null)
+            {
+                Movies = Movies.Where(movie => movie.Title != null && movie.Title.Contains(SearchTerms, StringComparison.InvariantCultureIgnoreCase));
+            }
+            // Filter by MPAA Rating 
+            if (MPAARatings != null && MPAARatings.Length != 0)
+            {
+                Movies = Movies.Where(movie =>
+                    movie.MPAARating != null &&
+                    MPAARatings.Contains(movie.MPAARating)
+                    );
+            }
+            if (TomMax != null || TomMin != null)
+            {
+                Movies = Movies.Where(movie => movie.RottenTomatoesRating != null 
+                && (movie.RottenTomatoesRating < TomMax && movie.RottenTomatoesRating > TomMin));
+            }
+            if (IMDBMax != null || IMDBMin != null)
+            {
+                Movies = Movies.Where(movie => movie.IMDBRating != null
+                && (movie.IMDBRating < IMDBMax && movie.IMDBRating > IMDBMin));
+            }
         }
     }
 }
